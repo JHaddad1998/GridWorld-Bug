@@ -1,0 +1,74 @@
+package client;
+
+import actors.*;
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import World.GridWorld;
+import World.Location;
+
+public class Main extends Application {
+
+    GridWorld world = new GridWorld(23, 23);
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+
+        world.addActor(new bug(new Location(22, 17), world));
+        world.addActor(new Actor(new Location(2, 22), world));
+        world.addActor(new Boxbug(new Location(11, 17), world, 5));
+        world.addActor(new circleBug(new Location(7, 7), world, 5));
+        world.addActor(new spiralBug(new Location(16, 7), world, 12));
+
+        //Panes control layout of window
+        StackPane root = new StackPane();
+        int width = 800;
+        int height = 600;
+
+        //canvas - a place to draw
+        Canvas canvas = new Canvas(width, height);
+
+        //GraphicsContext allow us to draw to a particular canvas
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        //add the canvas to the pane, so we can draw yo
+        root.getChildren().add(canvas);
+
+        //every javafx app needs at least one scene, :)
+        Scene scene = new Scene(root, width, height);
+
+        //every javafx app needs a stage
+        primaryStage.setTitle("GridWorld");
+
+        //we just added our scene to the stage
+        primaryStage.setScene(scene);
+
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                world.stepWorld();
+
+                //------ draw the world :) --------- :/
+                world.drawWorld(gc);
+
+                try {
+                    Thread.sleep(100); //1000 ms = 1 second
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+
+        //show the stage
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
