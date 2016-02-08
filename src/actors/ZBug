@@ -1,0 +1,70 @@
+package actors;
+
+import World.GridWorld;
+import World.Location;
+import javafx.scene.image.Image;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+/**
+ * Created by Joey C on 2/8/2016.
+ */
+public class ZBug extends Boxbug{
+    private int sideLength;
+    private int currentStep;
+    private int x = 0;
+
+    public ZBug(Location myLoc, GridWorld world, int sideLength) {
+        super(myLoc, world, sideLength);
+        this.sideLength = sideLength;
+        currentStep = 0;
+        try {
+            super.setImage(new Image(new FileInputStream(".\\images\\zBug.png")));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        setDirection(Location.EAST);
+
+    }
+
+    @Override
+    public void act() {
+            GridWorld myWorld = getMyWorld();
+            Location nextMove = getMyLoc().getLocInDirection(getDirection());
+            Location oldLocation = getMyLoc();
+            Actor a = myWorld.getActor(nextMove);
+            if (x != 3) {
+                System.out.print(x);
+                if (myWorld.isValidLoc(nextMove) && a == null || a instanceof Flower) {
+                    myWorld.moveActor(this, nextMove);
+                    myWorld.addActor(new Flower(oldLocation, myWorld));
+                    setMyLoc(nextMove);
+                    currentStep++;
+                    if (currentStep == sideLength && x == 0) {
+                        turnRight();
+                        turnRight();
+                        turnRight();
+                        currentStep = 0;
+                        x++;
+
+                    }else if (currentStep == sideLength &&x==2) {
+                        currentStep = 0;
+                        x++;
+                    }else if (currentStep == sideLength && x == 1) {
+                        turnLeft();
+                        turnLeft();
+                        turnLeft();
+                        currentStep = 0;
+                        x++;
+                    }
+                } else {//he couldn't move
+                    turnRight();
+                    turnRight();
+                    currentStep = 0;
+                    x = 0;
+                }
+            }
+        }
+
+}
