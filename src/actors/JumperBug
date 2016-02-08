@@ -1,0 +1,39 @@
+package actors;
+
+import World.GridWorld;
+import World.Location;
+import javafx.scene.image.Image;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+/**
+ * Created by Joey C on 2/8/2016.
+ */
+public class JumperBug extends bug {
+    public JumperBug(Location myLoc, GridWorld world) {
+        super(myLoc, world);
+        try {
+            super.setImage(new Image(new FileInputStream(".\\images\\jumpingBug.png")));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void act() {
+        GridWorld myWorld = getMyWorld();
+        Location nextMove = getMyLoc().getLocInDirectionTwoSteps(getDirection());
+        Location oldLocation = getMyLoc();
+        Actor a = myWorld.getActor(nextMove);
+
+        if (myWorld.isValidLoc(nextMove) && (a == null || a instanceof Flower)) {
+            myWorld.moveActor(this, nextMove);
+            myWorld.addActor(new Flower(oldLocation, myWorld));
+            setMyLoc(nextMove);
+        } else {
+            super.act();
+        }
+    }
+}
